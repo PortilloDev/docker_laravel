@@ -1,0 +1,48 @@
+version: '3'
+services:
+  nginx:
+    build: nginx
+    ports:
+      - "${APP_PORT}:80"
+    volumes:
+      - ./application:/var/www/html
+    networks:
+      - satelite
+    environment:
+      APP_ENV: ${APP_ENV}
+  php:
+    build: php
+    volumes:
+      - ./application:/var/www/html
+    networks:
+      - satelite
+    environment:
+      APP_ENV: ${APP_ENV}
+  
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - satelite
+  redis:
+    image: redis:alpine
+    volumes:
+      - redisdata:/data
+    networks:
+      - satelite
+networks:
+  satelite:
+    driver: "bridge"
+volumes:
+  redisdata:
+    driver: "local"
+  mysqldata:
+    driver: "local"
